@@ -1,0 +1,86 @@
+{# layout #}
+{% block formlayout_layout %}
+    {% if form.vars.layout is defined %}
+        {% with {form: form, layout: form.vars.layout} %}{{ block('formlayout_'~form.vars.layout.type) }}{% endwith %}
+    {% else %}
+        {% if form.children|length > 0 %}
+            {% for c in form.children %}
+                {{ form_label(c) }}
+                {% with {form: c} %}{{ block('formlayout_layout') }}{% endwith %}
+            {% endfor %}
+        {% else %}
+            {{ form_row(form) }}
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
+{# form #}
+{% block formlayout_form %}
+    {% for c in layout.children %}
+        {% with {form: form, layout: c} %}{{ block('formlayout_'~c.type) }}{% endwith %}
+    {% endfor %}
+{% endblock formlayout_form %}
+
+{# row #}
+{% block formlayout_row %}
+    <div {{ block('formlayout_attributes') }}>
+        {% for c in layout.children %}
+            {% with {form: form, layout: c} %}{{ block('formlayout_'~c.type) }}{% endwith %}
+        {% endfor %}
+    </div>
+{% endblock formlayout_row %}
+
+{# column #}
+{% block formlayout_column %}
+    <div {{ block('formlayout_attributes') }}>
+        {% for c in layout.children %}
+            {% with {form: form, layout: c} %}{{ block('formlayout_'~c.type) }}{% endwith %}
+        {% endfor %}
+    </div>
+{% endblock formlayout_column %}
+
+{# fields #}
+{% block formlayout_fields %}
+    {% for c in layout.children %}
+        {% with {form: form, layout: c} %}{{ block('formlayout_'~c.type) }}{% endwith %}
+    {% endfor %}
+{% endblock formlayout_fields %}
+
+{# field #}
+{% block formlayout_field %}
+    {% if form[layout.field] is defined %}
+        {% if form[layout.field].children|length > 0 %}
+            {{ form_label(form[layout.field]) }}
+        {% endif %}
+        {% with {form: form[layout.field]} %}{{ block('formlayout_layout') }}{% endwith %}
+    {% endif %}
+{% endblock formlayout_field %}
+
+{# button #}
+{% block formlayout_button %}
+    <button {{ block('formlayout_attributes') }}>
+        {% if layout.is_raw %}
+            {{ layout.content|raw }}
+        {% else %}
+            {{ layout.content|trans }}
+        {% endif %}
+    </button>
+{% endblock formlayout_button %}
+
+{# separator #}
+{% block formlayout_separator %}
+    <hr {{ block('formlayout_attributes') }}>
+{% endblock formlayout_separator %}
+
+{% block formlayout_attributes -%}
+    {%- for attrname, attrvalue in layout.attributes -%}
+        {{- " " -}}
+        {%- if attrname in ['placeholder', 'title'] -%}
+            {{- attrname }}="{{ translation_domain is same as(false) ? attrvalue : attrvalue|trans(attr_translation_parameters, translation_domain) }}"
+        {%- elseif attrvalue is same as(true) -%}
+            {{- attrname }}="{{ attrname }}"
+        {%- elseif attrvalue is not same as(false) -%}
+            {{- attrname }}="{{ attrvalue }}"
+        {%- endif -%}
+    {%- endfor -%}
+{%- endblock formlayout_attributes -%}

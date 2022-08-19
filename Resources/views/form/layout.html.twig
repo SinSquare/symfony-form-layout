@@ -1,0 +1,8 @@
+{% extends 'bootstrap_4_layout.html.twig' %}
+
+{%- block form -%}
+    {{ form_start(form) }}
+        {% use '@FormLayout/form/form_layout.html.twig' %}
+        {{ block('formlayout_layout') }}
+    {{ form_end(form) }}
+{%- endblock form -%}
